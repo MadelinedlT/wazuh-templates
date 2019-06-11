@@ -1,0 +1,31 @@
+# This is a template for the Wazuh-ALBSecurity Group
+#
+# Before Running: 
+#   - change the allowed IP's in the Security Group
+#   - change the vpcid and the subnet id
+#
+# Order to Run Templates:
+#     1. albsecgroup
+#     2. manager
+#     3. agent
+#     4. alb
+Resources:
+  WazuhAlbSecGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Wazuh-ALB Security Group
+      VpcId: vpc-996f08e0
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Wazuh-AlbSecGroup"
+      SecurityGroupIngress: 
+          - IpProtocol: tcp
+            FromPort: '80'
+            ToPort: '80'
+            CidrIp: 0.0.0.0/0
+Outputs:
+  SecGroup:
+    Description: the security group
+    Value: !Ref WazuhAlbSecGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-WazuhAlbSecGroup"

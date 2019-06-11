@@ -1,0 +1,108 @@
+# This is a template for Wazuh-Manager
+#
+# Before Running: 
+#     - change the vpcid and the subnet id
+#     - change elastic ip address
+#     - change allowed IP of security groups
+Parameters:
+  InstTypeParam:
+    Type: String
+    Default: t2.large
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+Resources:
+  ManInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      IamInstanceProfile: Ron-Test-Role
+      InstanceType: 
+        Ref:
+          InstTypeParam
+      ImageId: ami-024a64a6685d05041
+      SubnetId: subnet-ed6433a5
+      SecurityGroupIds: 
+        - !Ref WazuhManagerSecGroup
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Wazuh-Manager"
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref Ec2Instance
+      EIP: 34.238.145.186
+
+  WazuhManagerSecGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Wazuh-Manager Security Group
+      VpcId: vpc-996f08e0
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Wazuh-ManagerSecGroup"
+      SecurityGroupIngress: 
+          - IpProtocol: tcp
+            FromPort: '22'
+            ToPort: '22'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '22'
+            ToPort: '22'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '25'
+            ToPort: '25'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '25'
+            ToPort: '25'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: udp
+            FromPort: '1514'
+            ToPort: '1514'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: udp
+            FromPort: '1514'
+            ToPort: '1514'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '9200'
+            ToPort: '9200'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '9200'
+            ToPort: '9200'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '5601'
+            ToPort: '5601'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '5601'
+            ToPort: '5601'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '5601'
+            ToPort: '5601'
+            SourceSecurityGroupId: !ImportValue sec-wazuh-albsecgroup-WazuhAlbSecGroup
+          - IpProtocol: tcp
+            FromPort: '55000'
+            ToPort: '55000'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '55000'
+            ToPort: '55000'
+            CidrIp: 216.166.20.1/32
+Outputs:
+  WazManIP:
+    Description: The Wazuh Manager's IP Address
+    Value: 34.238.145.186
+    Export:
+      Name: !Sub "${AWS::StackName}-WazuhManIP"
+  WazManInstance:
+    Description: Wazuh Manager Instance
+    Value: !Ref Ec2Instance
+    Export:
+      Name: !Sub "${AWS::StackName}-WazuhManInstance"

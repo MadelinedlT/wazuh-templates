@@ -1,0 +1,52 @@
+# This is a template for an automatic load balancer, target group,
+# and listener 
+#
+# Imports: 
+#     - line 33 import already created alb sec group
+#     - line 23 imports an already created manager instance
+#
+# Before Running: 
+#     - change the vpcid and the subnet id
+
+Resources:
+  WazTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckPort: 5601
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      Matcher: 
+        HttpCode: "302"
+      Name: Wazuh-Target-Group
+      Port: 5601
+      Protocol: HTTP
+      TargetType: instance
+      Targets: 
+        - Id: !ImportValue sec-wazuh-manager-WazuhManInstance
+      UnhealthyThresholdCount: 2
+      VpcId: vpc-996f08e0
+  WazALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: Sec-Wazuh-LoadBal
+      Scheme: internet-facing
+      SecurityGroups: 
+        - !ImportValue sec-wazuh-albsecgroup-WazuhAlbSecGroup
+      Subnets: 
+        - subnet-a553c7ff
+        - subnet-ed6433a5
+      Type: application
+  WazListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties: 
+      DefaultActions: 
+        - Type: forward
+          TargetGroupArn: !Ref WazTargetGroup
+      LoadBalancerArn: !Ref WazALB
+      Port: 80
+      Protocol: HTTP

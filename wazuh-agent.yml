@@ -1,0 +1,71 @@
+# This is a template for the Wazuh-Agent box. 
+#
+# Before Running: 
+#   - change the allowed IP's in the Security Group
+#   - change the vpcid and the subnet id
+
+Parameters:
+  InstTypeParam:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+Resources:
+  AgeInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      IamInstanceProfile: Ron-Test-Role
+      InstanceType: 
+        Ref:
+          InstTypeParam
+      SubnetId: subnet-ed6433a5
+      ImageId: ami-024a64a6685d05041
+      SecurityGroupIds:
+          - !Ref WazuhAgentSecGroup
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Wazuh-Agent"
+  WazuhAgentSecGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Wazuh-AgentSecGroup"
+      VpcId: vpc-996f08e0
+      GroupDescription: Wazuh-Agent Security Group
+      SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: '22'
+            ToPort: '22'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '22'
+            ToPort: '22'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '80'
+            ToPort: '80'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '80'
+            ToPort: '80'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: udp
+            FromPort: '1514'
+            ToPort: '1514'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: udp
+            FromPort: '1514'
+            ToPort: '1514'
+            CidrIp: 216.166.20.1/32
+          - IpProtocol: tcp
+            FromPort: '9200'
+            ToPort: '9200'
+            CidrIp: 10.0.0.0/8
+          - IpProtocol: tcp
+            FromPort: '9200'
+            ToPort: '9200'
+            CidrIp: 216.166.20.1/32
