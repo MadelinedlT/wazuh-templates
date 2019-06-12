@@ -26,7 +26,7 @@ Resources:
       Protocol: HTTP
       TargetType: instance
       Targets: 
-        - Id: !ImportValue sec-wazuh-manager-WazuhManInstance
+        - Id: !ImportValue WazuhManInstance
       UnhealthyThresholdCount: 2
       VpcId: vpc-996f08e0
   WazALB:
@@ -36,7 +36,7 @@ Resources:
       Name: Sec-Wazuh-LoadBal
       Scheme: internet-facing
       SecurityGroups: 
-        - !ImportValue sec-wazuh-albsecgroup-WazuhAlbSecGroup
+        - !ImportValue waz-albsecgroup-WazuhAlbSecGroup
       Subnets: 
         - subnet-a553c7ff
         - subnet-ed6433a5

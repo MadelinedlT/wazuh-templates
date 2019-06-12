@@ -18,9 +18,6 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties:
       IamInstanceProfile: Ron-Test-Role
-      InstanceType: 
-        Ref:
-          InstTypeParam
       SubnetId: subnet-ed6433a5
       ImageId: ami-024a64a6685d05041
       SecurityGroupIds:

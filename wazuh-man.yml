@@ -18,9 +18,6 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties:
       IamInstanceProfile: Ron-Test-Role
-      InstanceType: 
-        Ref:
-          InstTypeParam
       ImageId: ami-024a64a6685d05041
       SubnetId: subnet-ed6433a5
       SecurityGroupIds: 
@@ -31,7 +28,7 @@ Resources:
   IPAssoc:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      InstanceId: !Ref Ec2Instance
+      InstanceId: !Ref ManInstance
       EIP: 34.238.145.186
 
   WazuhManagerSecGroup:
@@ -86,7 +83,7 @@ Resources:
           - IpProtocol: tcp
             FromPort: '5601'
             ToPort: '5601'
-            SourceSecurityGroupId: !ImportValue sec-wazuh-albsecgroup-WazuhAlbSecGroup
+            SourceSecurityGroupId: !ImportValue waz-albsecgroup-WazuhAlbSecGroup
           - IpProtocol: tcp
             FromPort: '55000'
             ToPort: '55000'
@@ -103,6 +100,6 @@ Outputs:
       Name: !Sub "${AWS::StackName}-WazuhManIP"
   WazManInstance:
     Description: Wazuh Manager Instance
-    Value: !Ref Ec2Instance
+    Value: !Ref ManInstance
     Export:
-      Name: !Sub "${AWS::StackName}-WazuhManInstance"
+      Name: !Sub "WazuhManInstance"
