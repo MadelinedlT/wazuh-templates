@@ -20,8 +20,13 @@ Resources:
       IamInstanceProfile: Ron-Test-Role
       ImageId: ami-024a64a6685d05041
       SubnetId: subnet-ed6433a5
+      InstanceType: 
+        Ref:
+          InstTypeParam
       SecurityGroupIds: 
         - !Ref WazuhManagerSecGroup
+      InstanceType: 
+        Ref: InstTypeParam
       Tags:
         - Key: "Name"
           Value: "Sec-Wazuh-Manager"

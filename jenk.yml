@@ -1,0 +1,70 @@
+# This is a template for Jenkins Server
+#
+# Before Running: 
+#     - change the vpcid and the subnet id
+#     - change elastic ip address
+#     - change allowed IP of security groups
+Parameters:
+  InstTypeParam:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+Resources:
+  JenkinsInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      IamInstanceProfile: SecJenkinsCloudFormation
+      InstanceType: 
+        Ref:
+          InstTypeParam
+      SubnetId: subnet-ed6433a5
+      ImageId: ami-0c6b1d09930fac512
+      SecurityGroupIds:
+          - !Ref JenkinsTestGroup
+      Tags:
+        - Key: "Name"
+          Value: "Sec-Jenkins-Test"
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref JenkinsInstance
+      EIP: 54.208.194.127
+  JenkinsTestGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "Sec-JenkinTestGroup"
+      VpcId: vpc-996f08e0
+      GroupDescription: Jenkins Test Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 216.166.20.1/32
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 10.0.0.0/8
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 216.166.20.1/32
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 10.0.0.0/8
+  JenkinsTestDNS:
+      Type: AWS::Route53::RecordSet
+      Properties: 
+          HostedZoneId: ZPRJOL73U7TVG
+          Comment: dns record for jenkins server
+          Name: jenktests.sandbox.bazaarvoice.com.
+          Type: A
+          TTL: '900'
+          ResourceRecords: 
+            - 54.208.194.127
