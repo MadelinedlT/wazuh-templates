@@ -22,9 +22,16 @@ Resources:
       ImageId: ami-024a64a6685d05041
       SecurityGroupIds:
           - !Ref WazuhAgentSecGroup
+      InstanceType: 
+        Ref: InstTypeParam
       Tags:
         - Key: "Name"
           Value: "Sec-Wazuh-Agent"
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref AgeInstance
+      EIP: 52.205.140.24
   WazuhAgentSecGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
